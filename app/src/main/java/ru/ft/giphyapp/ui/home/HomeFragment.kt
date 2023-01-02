@@ -7,28 +7,27 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
-import ru.ft.giphyapp.App
 import ru.ft.giphyapp.R
+import ru.ft.giphyapp.Tags
 import ru.ft.giphyapp.databinding.FragmentHomeBinding
-import javax.inject.Inject
+import ru.ft.giphyapp.ui.util.appComponent
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
-    private val viewModel: HomeViewModel by viewModels { vmFactory }
     private val binding by viewBinding(FragmentHomeBinding::bind)
-
-    @Inject
-    lateinit var vmFactory: HomeViewModel.Factory
+    private val viewModel: HomeViewModel by viewModels {
+        requireContext().appComponent.homeViewModelFactory
+    }
 
     override fun onAttach(context: Context) {
-        (requireActivity().application as App).appComponent.inject(this)
+        context.appComponent.inject(this)
         super.onAttach(context)
-        Log.d("AAA", "Fragment onAttach")
+        Log.d(Tags.ANDROID_LIFECYCLE, "Fragment onAttach")
     }
 
     override fun onDetach() {
         super.onDetach()
-        Log.d("AAA", "Fragment onDetach")
+        Log.d(Tags.ANDROID_LIFECYCLE, "Fragment onDetach")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
