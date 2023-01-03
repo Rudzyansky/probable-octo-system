@@ -9,21 +9,20 @@ import ru.ft.giphyapp.data.service.GiphyHttpClientFactoryImpl
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-@Module(includes = [NetworkModuleBinds::class])
-class NetworkModule {
-
-    @Provides
-    @Singleton
-    @GiphyHttpClient
-    fun provideGiphyHttpClient(factory: GiphyHttpClientFactory): HttpClient = factory.newInstance()
-}
-
 @Module
-interface NetworkModuleBinds {
+interface NetworkModule {
 
     @Binds
     @Singleton
     fun bindGiphyHttpClientFactory(impl: GiphyHttpClientFactoryImpl): GiphyHttpClientFactory
+
+    companion object {
+        @Provides
+        @Singleton
+        @GiphyHttpClient
+        fun provideGiphyHttpClient(factory: GiphyHttpClientFactory): HttpClient =
+            factory.newInstance()
+    }
 }
 
 @Qualifier
