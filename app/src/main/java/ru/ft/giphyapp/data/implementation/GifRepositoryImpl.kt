@@ -1,6 +1,5 @@
 package ru.ft.giphyapp.data.implementation
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.ft.giphyapp.data.dto.GifObjectDto
 import ru.ft.giphyapp.data.dto.ListGifsDto
@@ -9,15 +8,17 @@ import ru.ft.giphyapp.domain.entity.GifListObject
 import ru.ft.giphyapp.domain.entity.GifObject
 import ru.ft.giphyapp.domain.entity.GiphyRating
 import ru.ft.giphyapp.domain.repository.GifRepository
+import ru.ft.giphyapp.util.CoroutineDispatcherProvider
 import javax.inject.Inject
 import kotlin.math.ceil
 
 class GifRepositoryImpl @Inject constructor(
-    private val api: GiphyApi
+    private val api: GiphyApi,
+    private val dispatchers: CoroutineDispatcherProvider
 ) : GifRepository {
 
     override suspend fun getTrending(page: Int, rating: GiphyRating): GifListObject =
-        withContext(Dispatchers.IO) {
+        withContext(dispatchers.IO) {
             api.trending(
                 offset = page * LIMIT_ON_PAGE,
                 limit = LIMIT_ON_PAGE,

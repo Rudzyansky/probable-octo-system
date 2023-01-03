@@ -4,10 +4,10 @@ import dagger.Module
 
 @Module(
     includes = [
+        CoroutineDispatcherModule::class,
         NetworkModule::class,
         RepositoryModule::class,
         InteractorModule::class,
-        CoroutineDispatcherModule::class,
     ]
 )
 interface AppModule

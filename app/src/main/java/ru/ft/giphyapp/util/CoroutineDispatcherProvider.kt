@@ -5,21 +5,15 @@ import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
 interface CoroutineDispatcherProvider {
-    fun get(): CoroutineDispatcher
+    val Default: CoroutineDispatcher
+    val Main: CoroutineDispatcher
+    val Unconfined: CoroutineDispatcher
+    val IO: CoroutineDispatcher
 }
 
-class DefaultCoroutineDispatcherProvider @Inject constructor() : CoroutineDispatcherProvider {
-    override fun get(): CoroutineDispatcher = Dispatchers.Default
-}
-
-class MainCoroutineDispatcherProvider @Inject constructor() : CoroutineDispatcherProvider {
-    override fun get(): CoroutineDispatcher = Dispatchers.Main
-}
-
-class UnconfinedCoroutineDispatcherProvider @Inject constructor() : CoroutineDispatcherProvider {
-    override fun get(): CoroutineDispatcher = Dispatchers.Unconfined
-}
-
-class IOCoroutineDispatcherProvider @Inject constructor() : CoroutineDispatcherProvider {
-    override fun get(): CoroutineDispatcher = Dispatchers.IO
+class CoroutineDispatcherProviderImpl @Inject constructor() : CoroutineDispatcherProvider {
+    override val Default get() = Dispatchers.Default
+    override val Main get() = Dispatchers.Main
+    override val Unconfined get() = Dispatchers.Unconfined
+    override val IO get() = Dispatchers.IO
 }
