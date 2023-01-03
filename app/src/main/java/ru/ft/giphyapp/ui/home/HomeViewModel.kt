@@ -4,21 +4,24 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import ru.ft.giphyapp.Tags
+import ru.ft.giphyapp.domain.interactor.GiphyInteractor
 import javax.inject.Inject
 import javax.inject.Provider
 
 class HomeViewModel @Inject constructor(
+    private val giphyInteractor: GiphyInteractor
 ) : ViewModel() {
 
     val a = ""
 
     init {
-        Log.d(Tags.ANDROID_LIFECYCLE, "ViewModel init")
+        Log.d(Tags.AndroidLifecycle, "ViewModel init")
     }
 
     override fun onCleared() {
-        Log.d(Tags.ANDROID_LIFECYCLE, "ViewModel onCleared")
+        Log.d(Tags.AndroidLifecycle, "ViewModel onCleared")
         super.onCleared()
+        giphyInteractor.cleanup()
     }
 
     class Factory @Inject constructor(

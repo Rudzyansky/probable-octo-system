@@ -22,12 +22,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onAttach(context: Context) {
         context.appComponent.inject(this)
         super.onAttach(context)
-        Log.d(Tags.ANDROID_LIFECYCLE, "Fragment onAttach")
+        Log.d(Tags.AndroidLifecycle, "Fragment onAttach")
     }
 
     override fun onDetach() {
         super.onDetach()
-        Log.d(Tags.ANDROID_LIFECYCLE, "Fragment onDetach")
+        Log.d(Tags.AndroidLifecycle, "Fragment onDetach")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

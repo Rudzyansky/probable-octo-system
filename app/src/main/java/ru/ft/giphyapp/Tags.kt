@@ -1,5 +1,7 @@
 package ru.ft.giphyapp
 
 object Tags {
-    const val ANDROID_LIFECYCLE = "Android Lifecycle"
+    const val AndroidLifecycle = "AndroidLifecycle"
+    const val GiphyInteractor = "GiphyInteractor"
+    const val KtorClient = "KtorClient"
 }
