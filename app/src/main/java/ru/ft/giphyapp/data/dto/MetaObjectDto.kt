@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MetaObjectDto(
-    @SerialName("msg") val msg: String,
-    @SerialName("status") val status: Int,
+    val msg: String,
+    val status: Int,
     @SerialName("response_id") val responseId: String,
 )

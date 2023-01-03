@@ -1,26 +1,48 @@
 package ru.ft.giphyapp.data.implementation
 
-import android.util.Log
-import io.ktor.client.call.body
-import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
-import ru.ft.giphyapp.Constants
-import ru.ft.giphyapp.Tags
-import ru.ft.giphyapp.data.domain
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import ru.ft.giphyapp.data.dto.GifObjectDto
 import ru.ft.giphyapp.data.dto.ListGifsDto
 import ru.ft.giphyapp.data.service.GiphyApi
 import ru.ft.giphyapp.domain.entity.GifListObject
+import ru.ft.giphyapp.domain.entity.GifObject
+import ru.ft.giphyapp.domain.entity.GiphyRating
 import ru.ft.giphyapp.domain.repository.GifRepository
 import javax.inject.Inject
+import kotlin.math.ceil
 
 class GifRepositoryImpl @Inject constructor(
     private val api: GiphyApi
 ) : GifRepository {
 
-    override suspend fun getTrending(page: Int): GifListObject {
-        return api.trending(page * Constants.GIPHY_LIMIT).apply {
-            Log.d(Tags.KtorClient, this.request.url.encodedPath)
-            Log.d(Tags.KtorClient, bodyAsText())
-        }.body<ListGifsDto>().domain
+    override suspend fun getTrending(page: Int, rating: GiphyRating): GifListObject =
+        withContext(Dispatchers.IO) {
+            api.trending(
+                offset = page * LIMIT_ON_PAGE,
+                limit = LIMIT_ON_PAGE,
+                rating = rating.forApi
+            ).domain
+        }
+
+    private val GiphyRating.forApi
+        get() = when (this) {
+            GiphyRating.G -> "g"
+            GiphyRating.PG -> "pg"
+            GiphyRating.PG13 -> "pg-13"
+            GiphyRating.R -> "r"
+        }
+
+    private val GifObjectDto.domain get() = GifObject(id = id, url = url)
+
+    private val ListGifsDto.domain
+        get() = GifListObject(
+            gifs = data.map { it.domain },
+            currentPage = pagination.offset / LIMIT_ON_PAGE,
+            pagesCount = ceil(pagination.totalCount / LIMIT_ON_PAGE.toDouble()).toInt(),
+        )
+
+    companion object {
+        private const val LIMIT_ON_PAGE = 25
     }
 }

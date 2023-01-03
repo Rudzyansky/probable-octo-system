@@ -1,4 +1,4 @@
-package ru.ft.giphyapp
+package ru.ft.giphyapp.util
 
 object Tags {
     const val AndroidLifecycle = "AndroidLifecycle"
