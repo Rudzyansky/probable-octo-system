@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 data class GifObjectDto(
     val id: String,
     val url: String,
+    val images: ImagesDto,
 )
