@@ -81,13 +81,6 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
                             .onEach { get(it)?.cancel() }
                             .forEach { remove(it) }
                     }
-
-//                    if (!isLoading && last == total - 1) {
-//                        isLoading = true
-//                        Log.d(Tags.FeedLifecycle, "Load up (first = $first, last = $last, total = $total)")
-//                        viewModel.previousPage()
-//                        isLoading = false
-//                    }
                 }
             }
         }

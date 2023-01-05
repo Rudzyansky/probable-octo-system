@@ -15,6 +15,7 @@ import pl.droidsonroids.gif.GifDrawable
 import ru.ft.giphyapp.databinding.FeedGifItemBinding
 import ru.ft.giphyapp.databinding.FeedLoadingItemBinding
 import ru.ft.giphyapp.domain.entity.GifObject
+import ru.ft.giphyapp.domain.entity.LoadedContent
 import ru.ft.giphyapp.util.CoroutineDispatcherProvider
 import ru.ft.giphyapp.util.Tags
 
@@ -27,13 +28,11 @@ class GiphyAdapter(
     private val items = mutableMapOf<Int, GifObject>()
     val jobs = mutableMapOf<Int, Job>()
 
-    private var loadContent: suspend (GifObject, suspend (ByteArray) -> Unit) -> Unit = { _, _ -> }
+    private var loadContent: suspend (GifObject, suspend (LoadedContent) -> Unit) -> Unit = { _, _ -> }
 
     fun addToList(list: List<GifObject>, offset: Int) {
         val data = list.mapIndexed { index, gifObject -> offset + index to gifObject }
         items.putAll(data)
-//        items.clear()
-//        items.putAll(items.filter { it.key > offset - list.size } + data)
         Log.d(Tags.GiphyAdapter, "Offset: $offset; List: $list")
         notifyItemRangeChanged(offset, list.size)
     }
@@ -67,7 +66,7 @@ class GiphyAdapter(
                         contentIv.visibility = View.INVISIBLE
                     }
                     loadContent(item) {
-                        val drawable = GifDrawable(it).apply { loopCount = 0 }
+                        val drawable = GifDrawable(it.gif).apply { loopCount = 0 }
                         withContext(dispatchers.Main) {
                             contentIv.setImageDrawable(drawable)
                             contentIv.visibility = View.VISIBLE
@@ -83,7 +82,7 @@ class GiphyAdapter(
         return if (items.keys.contains(position)) GIF_TYPE else LOADING_TYPE
     }
 
-    fun setLoadContent(l: suspend (GifObject, callback: suspend (ByteArray) -> Unit) -> Unit) {
+    fun setLoadContent(l: suspend (GifObject, callback: suspend (LoadedContent) -> Unit) -> Unit) {
         loadContent = l
     }
 

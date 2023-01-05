@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.ft.giphyapp.domain.entity.GifListObject
 import ru.ft.giphyapp.domain.entity.GifObject
+import ru.ft.giphyapp.domain.entity.LoadedContent
 import ru.ft.giphyapp.domain.interactor.GiphyInteractor
 import ru.ft.giphyapp.ui.util.BaseViewModel
 import javax.inject.Inject
@@ -37,15 +38,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun previousPage() {
-        viewModelScope.launch {
-            val list = currentList.first()
-            val previousPage = list.currentPage - 1
-            if (previousPage >= 0) _currentList.emit(giphyInteractor.getTrending(previousPage))
-        }
-    }
-
-    suspend fun load(gifObject: GifObject): ByteArray {
+    suspend fun load(gifObject: GifObject): LoadedContent {
         return giphyInteractor.loadGif(gifObject)
     }
 

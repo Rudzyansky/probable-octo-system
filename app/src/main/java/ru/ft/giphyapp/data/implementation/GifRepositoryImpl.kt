@@ -9,6 +9,7 @@ import ru.ft.giphyapp.data.service.GiphyMediaApi
 import ru.ft.giphyapp.domain.entity.GifListObject
 import ru.ft.giphyapp.domain.entity.GifObject
 import ru.ft.giphyapp.domain.entity.GiphyRating
+import ru.ft.giphyapp.domain.entity.LoadedContent
 import ru.ft.giphyapp.domain.repository.GifRepository
 import ru.ft.giphyapp.util.CoroutineDispatcherProvider
 import javax.inject.Inject
@@ -30,7 +31,8 @@ class GifRepositoryImpl @Inject constructor(
         }
 
     override suspend fun getGif(gifObject: GifObject) = withContext(dispatchers.IO) {
-        mediaApi.raw(gifObject.dataUrl).toByteArray()
+        val gif = mediaApi.raw(gifObject.dataUrl).toByteArray()
+        LoadedContent(gif)
     }
 
     private val GiphyRating.forApi
