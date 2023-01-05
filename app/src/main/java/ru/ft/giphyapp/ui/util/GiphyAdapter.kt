@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pl.droidsonroids.gif.GifDrawable
@@ -24,6 +25,7 @@ class GiphyAdapter(
     private val scope = CoroutineScope(dispatchers.Default)
 
     private val items = mutableMapOf<Int, GifObject>()
+    private val jobs = mutableMapOf<Int, Job>()
 
     private var loadContent: suspend (GifObject, suspend (ByteArray) -> Unit) -> Unit = { _, _ -> }
 
@@ -49,20 +51,26 @@ class GiphyAdapter(
     override fun onBindViewHolder(holder: CommonViewHolder, position: Int) {
         when (holder.binding) {
             is FeedLoadingItemBinding -> {}
-            is FeedGifItemBinding -> {
+            is FeedGifItemBinding -> with (holder.binding) {
                 val item = items[position] ?: error("Item not found by position $position")
+
+                jobs[position]?.apply {
+                    cancel()
+                    jobs.remove(position)
+                }
 
                 // TODO: store jobs for cancel in recycle case
                 val job = scope.launch {
-                    holder.binding.contentIv.visibility = View.INVISIBLE
+                    contentIv.visibility = View.INVISIBLE
                     loadContent(item) {
                         val drawable = GifDrawable(it).apply { loopCount = 0 }
                         withContext(dispatchers.Main) {
-                            holder.binding.contentIv.setImageDrawable(drawable)
-                            holder.binding.contentIv.visibility = View.VISIBLE
+                            contentIv.setImageDrawable(drawable)
+                            contentIv.visibility = View.VISIBLE
                         }
                     }
                 }
+                jobs[position] = job
             }
         }
     }
