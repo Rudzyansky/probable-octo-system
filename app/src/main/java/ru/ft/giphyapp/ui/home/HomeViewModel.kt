@@ -12,7 +12,6 @@ import ru.ft.giphyapp.domain.entity.GifListObject
 import ru.ft.giphyapp.domain.entity.GifObject
 import ru.ft.giphyapp.domain.interactor.GiphyInteractor
 import ru.ft.giphyapp.ui.util.BaseViewModel
-import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -34,8 +33,15 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val list = currentList.first()
             val nextPage = list.currentPage + 1
-            if (nextPage < list.pagesCount)
-                _currentList.emit(giphyInteractor.getTrending(nextPage))
+            if (nextPage < list.pagesCount) _currentList.emit(giphyInteractor.getTrending(nextPage))
+        }
+    }
+
+    fun previousPage() {
+        viewModelScope.launch {
+            val list = currentList.first()
+            val previousPage = list.currentPage - 1
+            if (previousPage >= 0) _currentList.emit(giphyInteractor.getTrending(previousPage))
         }
     }
 

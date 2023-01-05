@@ -25,13 +25,15 @@ class GiphyAdapter(
     private val scope = CoroutineScope(dispatchers.Default)
 
     private val items = mutableMapOf<Int, GifObject>()
-    private val jobs = mutableMapOf<Int, Job>()
+    val jobs = mutableMapOf<Int, Job>()
 
     private var loadContent: suspend (GifObject, suspend (ByteArray) -> Unit) -> Unit = { _, _ -> }
 
     fun addToList(list: List<GifObject>, offset: Int) {
         val data = list.mapIndexed { index, gifObject -> offset + index to gifObject }
         items.putAll(data)
+//        items.clear()
+//        items.putAll(items.filter { it.key > offset - list.size } + data)
         Log.d(Tags.GiphyAdapter, "Offset: $offset; List: $list")
         notifyItemRangeChanged(offset, list.size)
     }
@@ -46,12 +48,12 @@ class GiphyAdapter(
         return CommonViewHolder(binding)
     }
 
-    override fun getItemCount() = items.count()
+    override fun getItemCount() = (items.keys.maxOrNull() ?: -1) + 1
 
     override fun onBindViewHolder(holder: CommonViewHolder, position: Int) {
         when (holder.binding) {
             is FeedLoadingItemBinding -> {}
-            is FeedGifItemBinding -> with (holder.binding) {
+            is FeedGifItemBinding -> with(holder.binding) {
                 val item = items[position] ?: error("Item not found by position $position")
 
                 jobs[position]?.apply {
@@ -61,7 +63,9 @@ class GiphyAdapter(
 
                 // TODO: store jobs for cancel in recycle case
                 val job = scope.launch {
-                    contentIv.visibility = View.INVISIBLE
+                    withContext(dispatchers.Main) {
+                        contentIv.visibility = View.INVISIBLE
+                    }
                     loadContent(item) {
                         val drawable = GifDrawable(it).apply { loopCount = 0 }
                         withContext(dispatchers.Main) {
