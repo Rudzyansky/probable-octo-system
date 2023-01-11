@@ -6,6 +6,8 @@ buildscript {
         navigation_version = '2.5.3'
         dagger_version = '2.44.2'
         ktor_version = '2.2.1'
+        paging_version = '3.1.1'
+        room_version = '2.4.3'
     }
     repositories {
         google()
