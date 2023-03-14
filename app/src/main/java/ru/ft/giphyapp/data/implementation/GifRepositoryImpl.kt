@@ -1,12 +1,15 @@
 package ru.ft.giphyapp.data.implementation
 
+import io.ktor.util.toByteArray
 import kotlinx.coroutines.withContext
 import ru.ft.giphyapp.data.dto.GifObjectDto
 import ru.ft.giphyapp.data.dto.ListGifsDto
 import ru.ft.giphyapp.data.service.GiphyApi
+import ru.ft.giphyapp.data.service.GiphyMediaApi
 import ru.ft.giphyapp.domain.entity.GifListObject
 import ru.ft.giphyapp.domain.entity.GifObject
 import ru.ft.giphyapp.domain.entity.GiphyRating
+import ru.ft.giphyapp.domain.entity.LoadedContent
 import ru.ft.giphyapp.domain.repository.GifRepository
 import ru.ft.giphyapp.util.CoroutineDispatcherProvider
 import javax.inject.Inject
@@ -14,6 +17,7 @@ import kotlin.math.ceil
 
 class GifRepositoryImpl @Inject constructor(
     private val api: GiphyApi,
+    private val mediaApi: GiphyMediaApi,
     private val dispatchers: CoroutineDispatcherProvider
 ) : GifRepository {
 
@@ -26,6 +30,11 @@ class GifRepositoryImpl @Inject constructor(
             ).domain
         }
 
+    override suspend fun getGif(gifObject: GifObject) = withContext(dispatchers.IO) {
+        val gif = mediaApi.raw(gifObject.dataUrl).toByteArray()
+        LoadedContent(gif)
+    }
+
     private val GiphyRating.forApi
         get() = when (this) {
             GiphyRating.G -> "g"
@@ -34,7 +43,12 @@ class GifRepositoryImpl @Inject constructor(
             GiphyRating.R -> "r"
         }
 
-    private val GifObjectDto.domain get() = GifObject(id = id, url = url)
+    private val GifObjectDto.domain
+        get() = GifObject(
+            id = id,
+            url = url,
+            dataUrl = images.fixedWidth.url
+        )
 
     private val ListGifsDto.domain
         get() = GifListObject(
