@@ -3,16 +3,15 @@ package ru.ft.giphyapp.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.ft.giphyapp.domain.entity.GifListObject
 import ru.ft.giphyapp.domain.entity.GifObject
 import ru.ft.giphyapp.domain.entity.LoadedContent
 import ru.ft.giphyapp.domain.interactor.GiphyInteractor
-import ru.ft.giphyapp.ui.util.BaseViewModel
+import ru.ft.giphyapp.ui.common.DisplayContent
+import ru.ft.giphyapp.ui.common.ScreenState
+import ru.ft.giphyapp.ui.common.BaseViewModel
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -20,21 +19,33 @@ class HomeViewModel @Inject constructor(
     private val giphyInteractor: GiphyInteractor
 ) : BaseViewModel() {
 
-    private val _currentList = MutableSharedFlow<GifListObject>(1, 0, BufferOverflow.DROP_OLDEST)
+    private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Loading)
 
-    val currentList get() = _currentList.asSharedFlow()
+    val screenState get() = _screenState.asStateFlow()
+
+    private var currentPage = 0
+    private var totalPages = 0
 
     init {
         viewModelScope.launch {
-            _currentList.emit(giphyInteractor.getTrending(0))
+            val state = try {
+                val trending = giphyInteractor.getTrending(0)
+                totalPages = trending.pagesCount
+                ScreenState.Content(trending.gifs.map { DisplayContent.Gif(it) })
+            } catch (e: Throwable) {
+                ScreenState.Error(e.localizedMessage ?: "Unknown Error")
+            }
+            _screenState.emit(state)
         }
     }
 
     fun nextPage() {
         viewModelScope.launch {
-            val list = currentList.first()
-            val nextPage = list.currentPage + 1
-            if (nextPage < list.pagesCount) _currentList.emit(giphyInteractor.getTrending(nextPage))
+            val nextPage = currentPage + 1
+            if (nextPage < totalPages) {
+//                _currentList.emit(giphyInteractor.getTrending(nextPage))
+                currentPage = nextPage
+            }
         }
     }
 

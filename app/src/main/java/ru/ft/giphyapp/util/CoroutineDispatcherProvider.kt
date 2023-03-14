@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
+@Suppress("PropertyName")
 interface CoroutineDispatcherProvider {
     val Default: CoroutineDispatcher
     val Main: CoroutineDispatcher

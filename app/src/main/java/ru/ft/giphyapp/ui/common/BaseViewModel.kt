@@ -1,4 +1,4 @@
-package ru.ft.giphyapp.ui.util
+package ru.ft.giphyapp.ui.common
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
